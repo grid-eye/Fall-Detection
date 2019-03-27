@@ -1,0 +1,70 @@
+import csv     #用于处理csv文件
+import random    #用于随机数
+import math
+import operator
+import numpy as np
+from sklearn.datasets import load_iris
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.externals.six import StringIO
+from sklearn.tree import export_graphviz
+
+#加载数据集
+def loadDataset(filename,split,trainingSet=[],testSet = []):
+    with open(filename,"rt") as csvfile:
+        lines = csv.reader(csvfile)
+        temp = list(lines)
+        dataset = np.array(temp[1:],dtype = float)
+        """
+        #数据归一化
+        for x in range(4):
+            dataset[:,x] = (dataset[:, x] - np.mean(dataset[:, x])) / np.std(dataset[:, x])
+                            """
+        for x in range(dataset.shape[0]):
+            if random.random()<split:
+                trainingSet.append(dataset[x])
+            else:
+                testSet.append(dataset[x])
+
+#计算准确率
+def getAccuracy(test_target,predict_target):
+    correct = 0
+    for x in range(len(test_target)):
+        if test_target[x] == predict_target[x]:
+            correct+=1
+    return (correct/float(len(test_target))) * 100.0
+
+def main():
+    trainingSet = []  #训练数据集
+    testSet = []      #测试数据集
+    split = 0.8      #分割的比例
+    loadDataset(r"data.csv", split, trainingSet, testSet)
+    print ("Train set :" + repr(len(trainingSet)))
+    print ("Test set :" + repr(len(testSet)))
+
+    #训练集
+    train_data = np.array(trainingSet)[:,:len(trainingSet[0])-1]
+    # 训练集样本类别
+    train_target = np.array(trainingSet)[:,len(trainingSet[0])-1]
+    # 测试集
+    test_data = np.array(testSet)[:,:len(testSet[0])-1]
+    #测试集样本类别
+    test_target = np.array(testSet)[:,len(testSet[0])-1]
+    
+
+
+    #iris = load_iris()
+
+    clf = DecisionTreeClassifier(criterion='gini')
+    clf.fit(train_data, train_target)  # 训练决策树
+    #print(clf)
+    predict_target = clf.predict(test_data)  # 预测
+    accuracy = getAccuracy(test_target, predict_target)
+    print ("Accuracy:" + repr(accuracy) + "%")
+
+    with open("iris.dot", 'w') as f:
+        f = export_graphviz(clf, out_file=f)
+
+
+if __name__ == "__main__":
+    main()
+
