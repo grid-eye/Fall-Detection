@@ -39,12 +39,23 @@ def loadDataset(train_filename, test_filename,trainingSet=[],testSet = []):
 
 #计算准确率
 def getAccuracy(test_target,predict_target):
+    fall_num = np.sum(test_target == 1.0)
+    nonfall_num = np.sum(test_target == 0.0)
+    print(fall_num, nonfall_num)
+    predict_fall_num, predict_nonfall_num = fall_num, nonfall_num
     correct = 0
     for x in range(len(test_target)):
         if test_target[x] == predict_target[x]:
             correct+=1
+        else:
+            if predict_target[x] == 1.0:#若未跌倒被检测成跌倒
+                predict_nonfall_num -= 1
+            if predict_target[x] == 0.0:#若跌倒被检测成未跌倒
+                predict_fall_num -= 1
+    print("fall correct is " + repr(predict_fall_num/fall_num*100))
+    print("nonfall correct is " + repr(predict_nonfall_num/nonfall_num*100))
     return (correct/float(len(test_target))) * 100.0
-
+                                  
 def main(train_data = "", test_data = ""):
     trainingSet = []  #训练数据集
     testSet = []      #测试数据集
@@ -69,7 +80,7 @@ def main(train_data = "", test_data = ""):
     test_target = np.array(testSet)[:,len(testSet[0])-1]
     
     #build the decisionTreeClassifier
-    clf = DecisionTreeClassifier(criterion = 'gini', max_depth = 5, min_samples_split = 0.1, class_weight = "balanced")
+    clf = DecisionTreeClassifier(criterion = 'gini', max_depth = 4, min_samples_split = 0.05, class_weight = 'balanced')
     clf.fit(train_data, train_target)  # 训练决策树
     #print(clf)
     predict_target = clf.predict(test_data)  # 预测

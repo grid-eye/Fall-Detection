@@ -14,6 +14,10 @@ def split_loadDataset(filename,split,trainingSet=[],testSet = []):
         lines = csv.reader(csvfile)
         temp = list(lines)
         dataset = np.array(temp[1:],dtype = float)
+        #数据归一化
+        for x in range(4): 
+            dataset[:,x] = (dataset[:, x] - np.mean(dataset[:, x])) / np.std(dataset[:, x])
+        
         for x in range(dataset.shape[0]):
             if random.random()<split:
                 trainingSet.append(dataset[x])
@@ -25,6 +29,11 @@ def loadDataset(train_filename, test_filename,trainingSet=[],testSet = []):
         train_lines = csv.reader(train_csvfile)
         temp = list(train_lines)
         train_dataset = np.array(temp[1:],dtype = float)
+        
+        #数据归一化
+        for x in range(4): 
+            train_dataset[:,x] = (train_dataset[:, x] - np.mean(train_dataset[:, x])) / np.std(train_dataset[:, x])
+
         for x in range(train_dataset.shape[0]):
             trainingSet.append(train_dataset[x])
 
@@ -33,15 +42,30 @@ def loadDataset(train_filename, test_filename,trainingSet=[],testSet = []):
         temp = list(test_lines)
         test_dataset = np.array(temp[1:],dtype = float) 
         
+        #数据归一化
+        for x in range(4): 
+            test_dataset[:,x] = (test_dataset[:, x] - np.mean(test_dataset[:, x])) / np.std(test_dataset[:, x])
+        
         for x in range(test_dataset.shape[0]):
             testSet.append(test_dataset[x])
 
 #计算准确率
 def getAccuracy(test_target,predict_target):
+    fall_num = np.sum(test_target == 1.0)
+    nonfall_num = np.sum(test_target == 0.0)
+    print(fall_num, nonfall_num)
+    predict_fall_num, predict_nonfall_num = fall_num, nonfall_num
     correct = 0
     for x in range(len(test_target)):
         if test_target[x] == predict_target[x]:
             correct+=1
+        else:
+            if predict_target[x] == 1.0:#若未跌倒被检测成跌倒
+                predict_nonfall_num -= 1
+            if predict_target[x] == 0.0:#若跌倒被检测成未跌倒
+                predict_fall_num -= 1
+    print("fall correct is " + repr(predict_fall_num/fall_num*100))
+    print("nonfall correct is " + repr(predict_nonfall_num/nonfall_num*100))
     return (correct/float(len(test_target))) * 100.0
 
 def main(train_data = "", test_data = ""):
@@ -69,16 +93,18 @@ def main(train_data = "", test_data = ""):
     test_target = np.array(testSet)[:,len(testSet[0])-1]
     
     # kernel = 'rbf'
-    clf_rbf = svm.SVC(C=2.0, kernel='rbf', gamma='auto')
-    clf_rbf.fit(train_data, train_target)
-    score_rbf = clf_rbf.score(test_data,test_target)
-    print("The score of rbf is : %f"%score_rbf)
+    test_rbf = svm.SVC(C=1.0, kernel='rbf', gamma='auto')
+    test_rbf.fit(train_data, train_target)
+    predict_rbf = test_rbf.predict(test_data)
+    rbf_score = getAccuracy(test_target, predict_rbf)
+    print("The score of rbf is :" + repr(rbf_score))
 
     # kernel = 'linear'
-    clf_linear = svm.SVC(C=2.0, kernel='linear', gamma='auto')
-    clf_linear.fit(train_data, train_target)
-    score_linear = clf_linear.score(test_data,test_target)
-    print("The score of linear is : %f"%score_linear)
+    test_linear = svm.SVC(C=1.0, kernel='linear', gamma='auto')
+    test_linear.fit(train_data, train_target)
+    predict_linear = test_linear.predict(test_data)
+    linear_score = getAccuracy(test_target, predict_linear)
+    print("The score of linear is :" + repr(linear_score))
 
     """
     # kernel = 'poly'
@@ -87,8 +113,6 @@ def main(train_data = "", test_data = ""):
     score_poly = clf_poly.score(test_data,test_target)
     print("The score of poly is : %f"%score_poly)
     
-    with open("iris.dot", 'w') as f:
-        f = export_graphviz(clf, out_file=f)
     """
 
 if __name__ == "__main__":
