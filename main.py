@@ -3,6 +3,8 @@ import sys
 import time
 from examples.countpeople import CountPeople as CP
 from examples.calAveBgTemperature import readBgTemperature 
+from examples.feature_extraction import calFeature
+from real_time import * 
 """
 这个文件是自动收集n次m帧数据
 """
@@ -57,3 +59,13 @@ while counter < n:
 end_time = time.time()
 print(end_time - start_time)
 print("sucessfully test all picture")
+if len(sys.argv) > 4:
+    dataDir = imagedir + "/imagedata.npy"
+    #四个特征
+    max_moving_frame = 0
+    max_variance = 0.0
+    max_therhold_pixel_num = 0
+    max_R = 0.0
+    max_moving_frame, max_variance, max_therhold_pixel_num, max_R = calFeature(dataDir, max_moving_frame, max_variance, max_therhold_pixel_num, max_R)
+    feature = np.array([max_moving_frame,max_variance,max_therhold_pixel_num,max_R])
+    main_step(r"five_to_five.csv",feature)

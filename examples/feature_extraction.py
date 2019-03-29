@@ -64,7 +64,6 @@ def calR(curr_temp_frame):
     max_R_list.append(curr_R)
 
 def calFeature(dataDir, max_moving_frame = 0, max_variance = 0, max_therhold_pixel_num = 0, max_R = 0):
-    global max_R_list, max_var_list, active_pixel_num_list, max_R_list
     is_human = False
     all_frame = np.load(dataDir)
     if np.size(all_frame) < pick_frame * pixel_num:
@@ -130,7 +129,7 @@ def calFeature(dataDir, max_moving_frame = 0, max_variance = 0, max_therhold_pix
 
                                 
 def write_csv(max_moving_frame, max_variance, max_therhold_pixel_num, max_R, is_fall):
-    path  = "train_data.csv"
+    path  = "backup.csv"
     with open(path,'a+') as f:
         csv_write = csv.writer(f)
         data_row = [max_moving_frame, max_variance, max_therhold_pixel_num, max_R, is_fall]
@@ -155,7 +154,7 @@ if __name__ == "__main__":
     currDir = os.path.abspath(os.path.dirname(__file__))
     if currDir.endswith("examples"):
         Dir = currDir + "/" + Dir
-    print(Dir)
+    
     max_moving_frame, max_variance, max_therhold_pixel_num, max_R = calFeature(Dir, max_moving_frame, max_variance, max_therhold_pixel_num, max_R)
     print(max_moving_frame, max_variance, max_therhold_pixel_num, max_R)
     if len(sys.argv) > 2:

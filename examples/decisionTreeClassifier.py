@@ -4,7 +4,6 @@ import random    #用于随机数
 import math
 import operator
 import numpy as np
-from sklearn.datasets import load_iris
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.externals.six import StringIO
 from sklearn.tree import export_graphviz
@@ -41,7 +40,6 @@ def loadDataset(train_filename, test_filename,trainingSet=[],testSet = []):
 def getAccuracy(test_target,predict_target):
     fall_num = np.sum(test_target == 1.0)
     nonfall_num = np.sum(test_target == 0.0)
-    print(fall_num, nonfall_num)
     predict_fall_num, predict_nonfall_num = fall_num, nonfall_num
     correct = 0
     for x in range(len(test_target)):
@@ -56,7 +54,7 @@ def getAccuracy(test_target,predict_target):
     print("nonfall correct is " + repr(predict_nonfall_num/nonfall_num*100))
     return (correct/float(len(test_target))) * 100.0
                                   
-def main(train_data = "", test_data = ""):
+def decisiontree(train_data = "", test_data = ""):
     trainingSet = []  #训练数据集
     testSet = []      #测试数据集
     split = 0.5      #分割的比例
@@ -96,7 +94,7 @@ if __name__ == "__main__":
         try:
             train_data = sys.argv[1]
             test_data = sys.argv[2]
-            main(train_data, test_data)
+            decisiontree(train_data, test_data)
         except:
             raise ValueError("please input the correct dir of npy data")
     else:

@@ -32,24 +32,21 @@ def loadDataset(train_filename, test_filename,trainingSet=[],testSet = []):
         train_lines = csv.reader(train_csvfile)
         temp = list(train_lines)
         train_dataset = np.array(temp[1:],dtype = float)
-        #数据归一化
-        for x in range(4):
-            train_dataset[:,x] = (train_dataset[:, x] - np.mean(train_dataset[:, x])) / np.std(train_dataset[:, x])
-        
-        for x in range(train_dataset.shape[0]):
-            trainingSet.append(train_dataset[x])
-
     with open(test_filename,"rt") as test_csvfile:
         test_lines = csv.reader(test_csvfile)
         temp = list(test_lines)
         test_dataset = np.array(temp[1:],dtype = float)
-        #数据归一化
-        for x in range(4):
-            test_dataset[:,x] = (test_dataset[:, x] - np.mean(test_dataset[:, x])) / np.std(test_dataset[:, x]) 
-        
-        for x in range(test_dataset.shape[0]):
-            testSet.append(test_dataset[x])
+    all_dataset = np.concatenate((test_dataset,train_dataset), axis = 0)
+    #数据归一化
+    for x in range(4):
+        train_dataset[:,x] = (train_dataset[:, x] - np.mean(all_dataset[:, x])) / np.std(all_dataset[:, x])
+        test_dataset[:,x] = (test_dataset[:, x] - np.mean(all_dataset[:, x])) / np.std(all_dataset[:, x])
+    for x in range(train_dataset.shape[0]):
+        trainingSet.append(train_dataset[x])
+        testSet.append(test_dataset[x])
 
+    print(trainingSet)
+    print(testSet)
 #计算距离
 def euclideanDistance(instance1,instance2,length):
     distance = 0
@@ -105,7 +102,7 @@ def getAccuracy(testSet,predictions):
     return (correct/float(len(testSet))) * 100.0
                                                                                                                          
 
-def main(train_data = "", test_data = ""):
+def kneighbor(train_data = "", test_data = ""):
     trainingSet = []  #训练数据集
     testSet = []      #测试数据集
     split = 0.1 #分割的比例
@@ -134,7 +131,7 @@ if __name__ == "__main__":
         try:
             train_data = sys.argv[1]
             test_data = sys.argv[2]
-            main(train_data, test_data)
+            kneighbor(train_data, test_data)
         except:
             raise ValueError("please input the correct dir of npy data")
     else:
