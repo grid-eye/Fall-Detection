@@ -63,9 +63,8 @@ def calR(curr_temp_frame):
     curr_R = props[max_area_pos].area * max(row_len, col_len) / min(row_len, col_len)
     max_R_list.append(curr_R)
 
-def calFeature(dataDir, max_moving_frame = 0, max_variance = 0, max_therhold_pixel_num = 0, max_R = 0):
+def calFeature(all_frame, max_moving_frame = 0, max_variance = 0, max_therhold_pixel_num = 0, max_R = 0):
     is_human = False
-    all_frame = np.load(dataDir)
     if np.size(all_frame) < pick_frame * pixel_num:
         raise ValueError("please input the dir larger than 10*64")
 
@@ -108,6 +107,7 @@ def calFeature(dataDir, max_moving_frame = 0, max_variance = 0, max_therhold_pix
                 if max_moving_frame < curr_k_end - curr_k_start + 1:
                     k_start = curr_k_start
                     k_end = curr_k_end
+                    print(k_start, k_end)
                     #计算出最大运动帧数
                     max_moving_frame = curr_k_end - curr_k_start + 1
                     #计算出最大方差
@@ -154,8 +154,9 @@ if __name__ == "__main__":
     currDir = os.path.abspath(os.path.dirname(__file__))
     if currDir.endswith("examples"):
         Dir = currDir + "/" + Dir
-    
-    max_moving_frame, max_variance, max_therhold_pixel_num, max_R = calFeature(Dir, max_moving_frame, max_variance, max_therhold_pixel_num, max_R)
+    #读取数据
+    all_frame = np.load(Dir)    
+    max_moving_frame, max_variance, max_therhold_pixel_num, max_R = calFeature(all_frame, max_moving_frame, max_variance, max_therhold_pixel_num, max_R)
     print(max_moving_frame, max_variance, max_therhold_pixel_num, max_R)
     if len(sys.argv) > 2:
         is_fall = sys.argv[2]

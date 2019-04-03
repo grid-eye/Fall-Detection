@@ -18,7 +18,7 @@ def loadDataset(filename):
 
 def normalization(trainingSet, testSet):
     all_dataset = np.row_stack((trainingSet[:,:4],testSet))
-    print(all_dataset)
+    #print(all_dataset)
     #数据归一化
     for x in range(4):
         trainingSet[:,x] = (trainingSet[:, x] - np.mean(all_dataset[:, x])) / np.std(all_dataset[:, x])
@@ -63,17 +63,17 @@ def getResponse(neighbors):
                                                                                  
 
 def kneighbor(trainingSet, testSet):
-    print(testSet)
+    #print(testSet)
     normalization(trainingSet, testSet)
-    print(trainingSet)
-    print(testSet)
+    #print(trainingSet)
+    #print(testSet)
     k = 3
     neighbors = getNeighbors(trainingSet, testSet, k)
     result = getResponse(neighbors)
     if result == 0:
-        print("未检测到跌倒情况")
+        return False
     elif result == 1:
-        print("检测到跌倒情况")
+        return True
     else:
         raise ValueError("出现错误！")
 
@@ -83,7 +83,10 @@ def main_step(train_data = "", test_data = []):
     if testSet == [] or np.size(testSet,0) != 4:
         raise ValueError("please input the correct npy data")
     else:
-        trainingSet = loadDataset(r"examples/train_data.csv")
-    
+        if train_data == "":
+            trainingSet = loadDataset(r"examples/train_data.csv")
+        else:
+            trainingSet = loadDataset(train_data)
     print ("Train set :" + repr(len(trainingSet)) + "\nTest set :1")
-    kneighbor(trainingSet, testSet)
+    is_fall = kneighbor(trainingSet, testSet)
+    return is_fall

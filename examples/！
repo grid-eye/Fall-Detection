@@ -8,10 +8,8 @@ import math
 import scipy
 import os
 import sys
-import time
 import matplotlib.pyplot as plt
-from examples.feature_extraction import calFeature
-from examples.real_time import main_step
+
 class CountPeople:
     # otsu阈值处理后前景所占的比例阈值，低于这个阈值我们认为当前帧是背景，否则是前景
 
@@ -83,7 +81,6 @@ class CountPeople:
         # the result of the interpolating for the grid
         all_frames = []
         realtime_frame = []
-        realtime_counter = 0
         frame_counter = 0  # a counter of frames' num
         # diff_queues saves the difference between average_temp and curr_temp
         try:
@@ -101,34 +98,9 @@ class CountPeople:
                 if frame_counter >= frame_count:
                     self.saveImageData(all_frames, customDir)
                     break
-                #如果是实时检测
                 if is_realtime:
-                    realtime_frame.append(currFrame)
-                    #滑动窗口为60帧，每滑动10帧检测一次
-                    if len(realtime_frame) < 60:
-                        pass
-                    else:
-                        realtime_counter += 1
-                        if realtime_counter == 20:
-                            max_moving_frame = 0
-                            max_variance = 0.0
-                            max_therhold_pixel_num = 0
-                            max_R = 0.0
-                            temp_frame = np.array(realtime_frame)
-                            max_moving_frame, max_variance, max_therhold_pixel_num, max_R = calFeature(temp_frame, max_moving_frame, max_variance, max_therhold_pixel_num, max_R)
-                            if max_moving_frame != max_variance:
-                                feature = np.array([max_moving_frame,max_variance,max_therhold_pixel_num,max_R])
-                                is_fall = main_step(r"examples/five_to_five.csv",feature)
-                                if is_fall:
-                                    print(max_moving_frame, max_variance, max_therhold_pixel_num, max_R)
-                                    print("检测到跌倒状况")
-                                    time.sleep(5)
-                                realtime_frame = []
-                            else:
-                                realtime_frame = realtime_frame[20:]
-                            realtime_counter = 0
-                            print(len(realtime_frame)) 
-                    
+                    if realtime_frame.
+
         except KeyboardInterrupt:
             print("catch keyboard interrupt")
             # save all images
