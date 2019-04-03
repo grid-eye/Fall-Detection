@@ -105,11 +105,11 @@ class CountPeople:
                 if is_realtime:
                     realtime_frame.append(currFrame)
                     #滑动窗口为60帧，每滑动10帧检测一次
-                    if len(realtime_frame) < 60:
+                    if len(realtime_frame) < 40:
                         pass
                     else:
                         realtime_counter += 1
-                        if realtime_counter == 20:
+                        if realtime_counter == 30:
                             max_moving_frame = 0
                             max_variance = 0.0
                             max_therhold_pixel_num = 0
@@ -125,10 +125,8 @@ class CountPeople:
                                     time.sleep(5)
                                 realtime_frame = []
                             else:
-                                realtime_frame = realtime_frame[20:]
-                            realtime_counter = 0
-                            print(len(realtime_frame)) 
-                    
+                                realtime_frame = realtime_frame[30:]
+                            realtime_counter = 0 
         except KeyboardInterrupt:
             print("catch keyboard interrupt")
             # save all images

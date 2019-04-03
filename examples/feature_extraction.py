@@ -73,11 +73,14 @@ def calFeature(all_frame, max_moving_frame = 0, max_variance = 0, max_therhold_p
     curr_all_var = np.zeros(pixel_num)
     for k in range(pick_frame,frame_num + 1):
         curr_frame = all_frame[k - pick_frame:k,:,:]
+        """ 
         for i in range(row_num):
             for j in range(col_num):
                 curr_pixel = curr_frame[:,i,j]
                 curr_var = np.var(curr_pixel)
                 curr_all_var[i * 8 + j ] = curr_var
+        """
+        curr_all_var = np.var(curr_frame,0)
         #当前温度分布最大方差        
         curr_max_var = np.max(curr_all_var)
         #如果存在方差分布有超过阈值的像素点，则证明有人在传感器范围内
@@ -93,13 +96,6 @@ def calFeature(all_frame, max_moving_frame = 0, max_variance = 0, max_therhold_p
             active_pixel_num_list.append(active_num)
             #计算当前帧高温区域的形态特征R
             calR(curr_frame[pick_frame - 1])
-            """
-            print("the %dth frame"%(k + 1))
-            print(curr_all_var)
-            print(curr_max_var)
-            print(active_pixel)
-            print(active_num)
-            """
         else:
             if is_human:
                 is_human = False
