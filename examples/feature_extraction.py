@@ -127,7 +127,7 @@ def calFeature(all_frame, max_moving_frame = 0, max_variance = 0, max_therhold_p
 
                                 
 def write_csv(max_moving_frame, max_variance, max_therhold_pixel_num, max_R, is_fall):
-    path  = "backup.csv"
+    path  = "test.csv"
     with open(path,'a+') as f:
         csv_write = csv.writer(f)
         data_row = [max_moving_frame, max_variance, max_therhold_pixel_num, max_R, is_fall]

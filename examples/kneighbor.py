@@ -43,10 +43,9 @@ def loadDataset(train_filename, test_filename,trainingSet=[],testSet = []):
         test_dataset[:,x] = (test_dataset[:, x] - np.mean(all_dataset[:, x])) / np.std(all_dataset[:, x])
     for x in range(train_dataset.shape[0]):
         trainingSet.append(train_dataset[x])
+    for x in range(test_dataset.shape[0]):
         testSet.append(test_dataset[x])
 
-    print(trainingSet)
-    print(testSet)
 #计算距离
 def euclideanDistance(instance1,instance2,length):
     distance = 0
