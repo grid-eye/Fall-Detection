@@ -121,6 +121,8 @@ def calFeature(all_frame, max_moving_frame = 0, max_variance = 0, max_therhold_p
                 """
             else:
                 continue
+    if is_human:
+        return 0,0,0,0
     return max_moving_frame, max_variance, max_therhold_pixel_num, max_R
 
                                 

@@ -108,8 +108,8 @@ class CountPeople:
                     if len(realtime_frame) < 40:
                         pass
                     else:
-                        realtime_counter += 1
-                        if realtime_counter == 30:
+                        
+                        if realtime_counter == 20:
                             max_moving_frame = 0
                             max_variance = 0.0
                             max_therhold_pixel_num = 0
@@ -125,8 +125,10 @@ class CountPeople:
                                     time.sleep(5)
                                 realtime_frame = []
                             else:
-                                realtime_frame = realtime_frame[30:]
+                                realtime_frame = realtime_frame[20:]
                             realtime_counter = 0 
+                        else:
+                            realtime_counter += 1
         except KeyboardInterrupt:
             print("catch keyboard interrupt")
             # save all images
