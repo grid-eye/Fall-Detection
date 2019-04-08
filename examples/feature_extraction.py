@@ -78,7 +78,7 @@ def calFeature(all_frame, max_moving_frame = 0, max_variance = 0, max_therhold_p
             for j in range(col_num):
                 curr_pixel = curr_frame[:,i,j]
                 curr_var = np.var(curr_pixel)
-                curr_all_var[i * 8 + j ] = curr_var
+                curr_all_var[i * 8 + j ] = curr_var 
         """
         curr_all_var = np.var(curr_frame,0)
         #当前温度分布最大方差        
@@ -92,7 +92,7 @@ def calFeature(all_frame, max_moving_frame = 0, max_variance = 0, max_therhold_p
             max_var_list.append(curr_max_var)
             #存放活跃像素数量
             active_pixel = np.where(curr_all_var > therhold)
-            active_num = np.size(active_pixel)
+            active_num = np.size(active_pixel) // 2
             active_pixel_num_list.append(active_num)
             #计算当前帧高温区域的形态特征R
             calR(curr_frame[pick_frame - 1])
@@ -127,7 +127,7 @@ def calFeature(all_frame, max_moving_frame = 0, max_variance = 0, max_therhold_p
 
                                 
 def write_csv(max_moving_frame, max_variance, max_therhold_pixel_num, max_R, is_fall):
-    path  = "test.csv"
+    path  = "backup.csv"
     with open(path,'a+') as f:
         csv_write = csv.writer(f)
         data_row = [max_moving_frame, max_variance, max_therhold_pixel_num, max_R, is_fall]

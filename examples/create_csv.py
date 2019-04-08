@@ -1,6 +1,6 @@
 import csv
 
-path = "test.csv"
+path = "backup.csv"
 
 with open(path,'w') as f:
     csv_write = csv.writer(f)
