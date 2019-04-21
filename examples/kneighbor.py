@@ -104,17 +104,15 @@ def getAccuracy(testSet,predictions):
 def kneighbor(train_data = "", test_data = ""):
     trainingSet = []  #训练数据集
     testSet = []      #测试数据集
-    split = 0.1 #分割的比例
+    split = 0.5 #分割的比例
     k = 3
-    avg_accuracy = 0
-
     if train_data == "" and test_data == "":
-        split_loadDataset(r"data.csv", split, trainingSet, testSet)
+        split_loadDataset(r"three_to_seven.csv", split, trainingSet, testSet)
     elif train_data != "" and test_data != "" :
         loadDataset(train_data, test_data, trainingSet, testSet)
     print ("Train set :" + repr(len(trainingSet)))
     print ("Test set :" + repr(len(testSet)))        
-
+    
     predictions = []
     for x in range(len(testSet)):
         neighbors = getNeighbors(trainingSet, testSet[x], k)
@@ -134,4 +132,4 @@ if __name__ == "__main__":
         except:
             raise ValueError("please input the correct dir of npy data")
     else:
-        main()
+        kneighbor()

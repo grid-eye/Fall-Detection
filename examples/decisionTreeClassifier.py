@@ -57,9 +57,9 @@ def getAccuracy(test_target,predict_target):
 def decisiontree(train_data = "", test_data = ""):
     trainingSet = []  #训练数据集
     testSet = []      #测试数据集
-    split = 0.5      #分割的比例
+    split = 0.3      #分割的比例
     if train_data == "" and test_data == "":
-        split_loadDataset(r"one_to_nine.csv", split, trainingSet, testSet)
+        split_loadDataset(r"data.csv", split, trainingSet, testSet)
     elif train_data != "" and test_data != "" :
         loadDataset(train_data, test_data, trainingSet, testSet)
     else:
@@ -84,7 +84,6 @@ def decisiontree(train_data = "", test_data = ""):
     predict_target = clf.predict(test_data)  # 预测
     accuracy = getAccuracy(test_target, predict_target)
     print ("Accuracy:" + repr(accuracy) + "%")
-
     with open("iris.dot", 'w') as f:
         f = export_graphviz(clf, out_file=f)
 
@@ -98,4 +97,4 @@ if __name__ == "__main__":
         except:
             raise ValueError("please input the correct dir of npy data")
     else:
-        main()
+        decisiontree()

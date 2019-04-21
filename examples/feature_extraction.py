@@ -17,6 +17,7 @@ pick_frame = 10
 max_var_list = [] #存放最大方差的矩阵
 active_pixel_num_list = []#存放一帧中高温点的个数的矩阵
 max_R_list = []#存放高温区域的形态特征R的矩阵
+all_var = []
 
 def calR(curr_temp_frame):
     global max_R_list
@@ -84,6 +85,9 @@ def calFeature(all_frame, max_moving_frame = 0, max_variance = 0, max_therhold_p
         #当前温度分布最大方差        
         curr_max_var = np.max(curr_all_var)
         #如果存在方差分布有超过阈值的像素点，则证明有人在传感器范围内
+
+        #所有的最大方差
+        all_var.append(curr_max_var)
         if curr_max_var > therhold:
             if not is_human:
                 is_human = True
@@ -121,6 +125,9 @@ def calFeature(all_frame, max_moving_frame = 0, max_variance = 0, max_therhold_p
                 """
             else:
                 continue
+    print(all_var)
+    print(active_pixel_num_list)
+
     if is_human:
         return 0,0,0,0
     return max_moving_frame, max_variance, max_therhold_pixel_num, max_R
