@@ -12,6 +12,7 @@ import time
 import matplotlib.pyplot as plt
 from examples.feature_extraction import calFeature
 from examples.real_time import main_step
+from examples.show_frame import showframe
 class CountPeople:
     # otsu阈值处理后前景所占的比例阈值，低于这个阈值我们认为当前帧是背景，否则是前景
 
@@ -103,6 +104,7 @@ class CountPeople:
                     break
                 #如果是实时检测
                 if is_realtime:
+                    showframe(currFrame)
                     realtime_frame.append(currFrame)
                     #滑动窗口为60帧，每滑动10帧检测一次
                     if len(realtime_frame) < 50:
@@ -118,7 +120,7 @@ class CountPeople:
                             max_moving_frame, max_variance, max_therhold_pixel_num, max_R = calFeature(temp_frame, max_moving_frame, max_variance, max_therhold_pixel_num, max_R)
                             if max_moving_frame != max_variance:
                                 feature = np.array([max_moving_frame,max_variance,max_therhold_pixel_num,max_R])
-                                is_fall = main_step(r"examples/backup.csv",feature)
+                                is_fall = main_step(r"examples/test.csv",feature)
                                 if is_fall:
                                     print(max_moving_frame, max_variance, max_therhold_pixel_num, max_R)
                                     print("检测到跌倒状况")

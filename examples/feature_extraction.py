@@ -107,7 +107,6 @@ def calFeature(all_frame, max_moving_frame = 0, max_variance = 0, max_therhold_p
                 if max_moving_frame < curr_k_end - curr_k_start + 1:
                     k_start = curr_k_start
                     k_end = curr_k_end
-                    print(k_start, k_end)
                     #计算出最大运动帧数
                     max_moving_frame = curr_k_end - curr_k_start + 1
                     #计算出最大方差
@@ -125,8 +124,6 @@ def calFeature(all_frame, max_moving_frame = 0, max_variance = 0, max_therhold_p
                 """
             else:
                 continue
-    print(all_var)
-    print(active_pixel_num_list)
 
     if is_human:
         return 0,0,0,0
