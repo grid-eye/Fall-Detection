@@ -7,10 +7,9 @@ import threading
 from  multiprocessing import Process,Queue ,Event
 import os
 import cv2 as cv
-from countpeople import CountPeople
-from examples.show_frame import showframe
-from examples.feature_extraction import calFeature
-from examples.real_time import main_step
+from show_frame import showframe
+from feature_extraction import calFeature
+from real_time import main_step
 host1 = "192.168.1.100"
 show_frame = False
 all_frame_sensor_1 = []
@@ -109,7 +108,6 @@ def saveImageData(sensor1,path,avgtemp):
     np.save(path+"/imagedata.npy",np.array(sensor1))
     np.save(path+"/avgtemp.npy",avgtemp)
 all_merge_frame = []
-cp = CountPeople()
 i = 0 
 container = []
 #实时检测的数据收集
@@ -155,7 +153,7 @@ try:
                 max_moving_frame, max_variance, max_therhold_pixel_num, max_R = calFeature(temp_frame, max_moving_frame, max_variance, max_therhold_pixel_num, max_R)
                 if max_moving_frame != max_variance:
                     feature = np.array([max_moving_frame,max_variance,max_therhold_pixel_num,max_R])
-                    is_fall = main_step(r"examples/test.csv",feature)
+                    is_fall = main_step(r"test.csv",feature)
                     if is_fall:
                         print(max_moving_frame, max_variance, max_therhold_pixel_num, max_R)
                         print("检测到跌倒状况")
