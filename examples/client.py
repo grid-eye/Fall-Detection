@@ -235,7 +235,22 @@ try:
                 
                 #判断是否跌倒
                 if max_moving_frame_1 != 0 and max_moving_frame_2 != 0:
+                    feature_1 = np.array([max_moving_frame_1,max_variance_1,max_therhold_pixel_num_1,max_R_1])
+                    is_fall_1 = main_step(r"test.csv",feature_1)
+   
+                    feature_2 = np.array([max_moving_frame_2,max_variance_2,max_therhold_pixel_num_2,max_R_2])
+                    is_fall_2 = main_step(r"test.csv",feature_2)
+
+                    feature_3 = np.array([max_moving_frame_3,max_variance_3,max_therhold_pixel_num_3,max_R_3])
+                    is_fall_3 = main_step(r"test.csv",feature_3)
                     
+                    if is_fall_3:
+                        print("检测到跌倒状况")
+                        time.sleep(5)
+                    else:
+                        if is_fall_1 ^ is_fall_2:
+                            print("检测到跌倒状况")
+                            time.sleep(5)
 
                 elif max_moving_frame_1 != 0 and max_moving_frame_2 == 0:
                     feature = np.array([max_moving_frame_1,max_variance_1,max_therhold_pixel_num_1,max_R_1])
