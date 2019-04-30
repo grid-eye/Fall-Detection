@@ -121,6 +121,22 @@ def isSynchronize(t1,t2,thresh):
     if abs(t1 - t2 ) > thresh:
         return False
     return True
+def split_frame(s1, s2):
+    """    
+    avgCal_1 = np.mean(s1)
+    diff_1 = np.array([x - avgCal_1 for x in s1])
+    plot_img_1 = np.zeros(s1.shape,np.uint8)
+    plot_img_1[np.where(diff_1 > 1.5) ] = 255
+    
+    avgCal_2 = np.mean(s2)
+    diff_2 = np.array([x - avgCal_2 for x in s2])
+    plot_img_2 = np.zeros(s2.shape,np.uint8)
+    plot_img_2[np.where(diff_2 > 1.5) ] = 255
+    """
+    n1 = np.array(s1)
+    n2 = np.array(s2)
+    return np.hstack((n1[:,4:8],n2[:,0:4]))
+ 
 all_merge_frame = []
 cp = CountPeople()
 i = 0 
@@ -129,6 +145,12 @@ time_thresh = 0.06
 diff_sum = 0 
 toggle = False
 align = True#两帧数据时间线是否对齐，即同步
+#实时检测的数据收集
+realtime_frame_1 = []
+realtime_frame_2 = []
+realtime_frame_3 = []
+realtime_counter = 0
+
 
 try:
     while True:
@@ -181,54 +203,68 @@ try:
         all_frame_sensor_2.append(s2)
         print("=============show ===========")
         showData([s1,s2])
-        current_frame = mergeData(s1,s2)#合并两个传感器的数据,取最大值
-        container.append((s1,s2,current_frame))
-        if len(container) == 4:
-            last_three_tuple = container.pop(0)
-            last_three_frame = last_three_tuple[0]
-        if not cp.isCalcBg(): 
-            if i == thresh:
-                avgtemp = cp.calAverageTemp(all_merge_frame)
-                cp.setCalcBg(True)
-                cp.setBgTemperature(avgtemp)
-                cp.constructAverageBgModel(avgtemp)
-                print("==========time thresh is %.3f============="%(time_thresh))
-                print(show_frame)
-                if show_frame:
-                    cv.namedWindow("image",cv.WINDOW_NORMAL)
-                cp.calcBg = True
-                all_merge_frame=[]
-            else:
-                all_merge_frame.append(current_frame)
-            continue
-        diff = current_frame - avgtemp
+        current_frame_sensor1 = s1
+        current_frame_sensor2 = s2
+        current_frame_sensor3 = split_frame(s1,s2)
         if show_frame:
-            plot_img = np.zeros(current_frame.shape,np.uint8)
-            plot_img[ np.where(diff > 1.5) ] = 255
-            img_resize  = cv.resize(plot_img,(16,16),interpolation=cv.INTER_CUBIC)
-            cv.imshow("image",img_resize)
-            cv.waitKey(1)
-        res = False
-        ret = cp.isCurrentFrameContainHuman(current_frame,avgtemp,diff)
-        if not ret[0]:
-            cp.updateObjectTrackDictAgeAndInterval()
-            cp.tailOperate(current_frame,last_three_frame)
-            if cp.getExistPeople():
-                cp.setExistPeople(False)
-            continue
-        cp.setExistPeople(True)
-        print("extractbody")
-        (cnt_count,image ,contours,hierarchy),area =cp.extractBody(cp.average_temp, current_frame)
-        if cnt_count ==0:
-            cp.updateObjectTrackDictAgeAndInterval()
-            cp.tailOperate(current_frame,last_three_frame)
-            continue
-        #下一步是计算轮当前帧的中心位置
-        loc = cp.findBodyLocation(diff,contours,[ i for i in range(cp.row)])
-        cp.trackPeople(current_frame,loc)#检测人体运动轨迹
-        cp.updateObjectTrackDictAge()#增加目标年龄
-        cp.tailOperate(current_frame,last_three_frame)
-        #sleep(0.5)
+            showframe(current_frame_sensor1, "sensor1")
+            showframe(current_frame_sensor2, "sensor2")
+            showframe(current_frame_sensor3, "sensor3")
+        realtime_frame_1.append(current_frame_sensor1)
+        realtime_frame_2.append(current_frame_sensor2)
+        realtime_frame_3.append(current_frame_sensor3)
+
+        #滑动窗口为60帧，每滑动10帧检测一次
+        if len(realtime_frame_1) < 50:
+            pass
+        else:
+            realtime_counter += 1
+            if realtime_counter == 10:
+                max_moving_frame = 0
+                max_variance = 0.0
+                max_therhold_pixel_num = 0
+                max_R = 0.0
+                temp_frame_1 = np.array(realtime_frame_1)
+                temp_frame_2 = np.array(realtime_frame_2)
+                temp_frame_3 = np.array(realtime_frame_3)
+
+                max_moving_frame_1, max_variance_1, max_therhold_pixel_num_1, max_R_1 = calFeature(temp_frame_1)
+                max_moving_frame_2, max_variance_2, max_therhold_pixel_num_2, max_R_2 = calFeature(temp_frame_2)
+                max_moving_frame_3, max_variance_3, max_therhold_pixel_num_3, max_R_3 = calFeature(temp_frame_3)
+                
+                
+                #判断是否跌倒
+                if max_moving_frame_1 != 0 and max_moving_frame_2 != 0:
+                    
+
+                elif max_moving_frame_1 != 0 and max_moving_frame_2 == 0:
+                    feature = np.array([max_moving_frame_1,max_variance_1,max_therhold_pixel_num_1,max_R_1])
+                    is_fall = main_step(r"test.csv",feature)
+                    if is_fall:
+                        print(max_moving_frame_1, max_variance_1, max_therhold_pixel_num_1, max_R_1)
+                        print("检测到跌倒状况")
+                        time.sleep(5)
+                    realtime_frame_1 = []
+                    realtime_frame_2 = []
+                    realtime_frame_3 = []
+
+                elif max_moving_frame_1 == 0 and max_moving_frame_2 != 0:
+                    feature = np.array([max_moving_frame_2,max_variance_2,max_therhold_pixel_num_2,max_R_2])
+                    is_fall = main_step(r"test.csv",feature)
+                    if is_fall:
+                        print(max_moving_frame_2, max_variance_2, max_therhold_pixel_num_2, max_R_2)
+                        print("检测到跌倒状况")
+                        time.sleep(5)
+                    realtime_frame_1 = []
+                    realtime_frame_2 = []
+                    realtime_frame_3 = []
+                
+ 
+                else:
+                    realtime_frame = realtime_frame[10:]
+                realtime_counter = 0
+                
+            
         if mythread1.getQuitFlag() or mythread2.getQuitFlag():
             break
         if i >= thresh:
