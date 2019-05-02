@@ -104,6 +104,7 @@ def showData(data):
     print("================")
 
 def complement_diff(s1,s2):
+    
     Dir = "complement.npy"
     #读取路径
     currDir = os.path.abspath(os.path.dirname(__file__))
@@ -111,8 +112,12 @@ def complement_diff(s1,s2):
         Dir = currDir + "/" + Dir
     #读取数据
     diff_frame = np.load(Dir)
-    avg1 = np.mean(np.array(s1))
-    avg2 = np.mean(np.array(s2))
+    
+    s1 = np.array(s1)
+    s2 = np.array(s2)
+    avg1 = np.mean(s1)
+    avg2 = np.mean(s2)
+    
     if avg1 < avg2:
         s1 = s1 + diff_frame
     else: 

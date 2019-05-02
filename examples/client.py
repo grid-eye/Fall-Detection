@@ -8,6 +8,9 @@ from  multiprocessing import Process,Queue ,Event
 import os
 import cv2 as cv
 from show_frame import showframe
+from feature_extraction import calFeature
+from real_time import main_step
+
 host1 = "192.168.1.100"
 host2 = "192.168.1.211"
 port1 = 9999
@@ -136,6 +139,26 @@ def split_frame(s1, s2):
     n1 = np.array(s1)
     n2 = np.array(s2)
     return np.hstack((n1[:,4:8],n2[:,0:4]))
+def complement_diff(s1,s2):
+    
+    Dir = "complement.npy"
+    #读取路径
+    currDir = os.path.abspath(os.path.dirname(__file__))
+    if currDir.endswith("examples"):
+        Dir = currDir + "/" + Dir 
+    #读取数据
+    diff_frame = np.load(Dir)
+    
+    s1 = np.array(s1)
+    s2 = np.array(s2)
+    avg1 = np.mean(s1)
+    avg2 = np.mean(s2)
+    
+    if avg1 < avg2:
+        s1 = s1 + diff_frame
+    else: 
+        s2 = s2 + diff_frame
+    return s1,s2
  
 all_merge_frame = []
 i = 0 
@@ -198,6 +221,7 @@ try:
             isSync = isSynchronize(t1,t2,time_thresh)
             count += 1
         print(t1,t2)
+        s1,s2 = complement_diff(s1,s2)
         all_frame_sensor_1.append(s1)
         all_frame_sensor_2.append(s2)
         print("=============show ===========")
@@ -250,6 +274,10 @@ try:
                         if is_fall_1 ^ is_fall_2:
                             print("检测到跌倒状况")
                             time.sleep(5)
+                    
+                    realtime_frame_1 = []
+                    realtime_frame_2 = []
+                    realtime_frame_3 = []
 
                 elif max_moving_frame_1 != 0 and max_moving_frame_2 == 0:
                     feature = np.array([max_moving_frame_1,max_variance_1,max_therhold_pixel_num_1,max_R_1])
@@ -275,7 +303,10 @@ try:
                 
  
                 else:
-                    realtime_frame = realtime_frame[10:]
+                    realtime_frame_1 = realtime_frame_1[10:]
+                    realtime_frame_2 = realtime_frame_2[10:]
+                    realtime_frame_3 = realtime_frame_3[10:]
+
                 realtime_counter = 0
                 
             
