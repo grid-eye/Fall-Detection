@@ -103,6 +103,21 @@ def showData(data):
         print(np.array(item))
     print("================")
 
+def complement_diff(s1,s2):
+    Dir = "complement.npy"
+    #读取路径
+    currDir = os.path.abspath(os.path.dirname(__file__))
+    if currDir.endswith("examples"):
+        Dir = currDir + "/" + Dir
+    #读取数据
+    diff_frame = np.load(Dir)
+    avg1 = np.mean(np.array(s1))
+    avg2 = np.mean(np.array(s2))
+    if avg1 < avg2:
+        s1 = s1 + diff_frame
+    else: 
+        s2 = s2 + diff_frame
+    return s1,s2
 i = 0 
 thresh = 80#用于计算背景的帧数
 diff_time_thresh = 20
@@ -198,6 +213,8 @@ try:
             isSync = isSynchronize(t1,t2,time_thresh)
             count += 1
         print(t1,t2)
+        #温度差值补偿
+        s1,s2 = complement_diff(s1,s2)
         all_frame_sensor_1.append(s1)
         all_frame_sensor_2.append(s2)
         print("=============show ===========")
