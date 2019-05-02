@@ -7,7 +7,7 @@ import threading
 from  multiprocessing import Process,Queue ,Event
 import os
 import cv2 as cv
-from countpeople import CountPeople
+from show_frame import showframe
 host1 = "192.168.1.100"
 host2 = "192.168.1.211"
 port1 = 9999
@@ -138,7 +138,6 @@ def split_frame(s1, s2):
     return np.hstack((n1[:,4:8],n2[:,0:4]))
  
 all_merge_frame = []
-cp = CountPeople()
 i = 0 
 container = []
 time_thresh = 0.06
